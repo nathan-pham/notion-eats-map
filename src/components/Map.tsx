@@ -1,78 +1,90 @@
 import React, { useEffect, useRef } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import type { Restaurant } from "@/hooks/useRestaurants";
 
+// Fix default marker icons in Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
+
 type MapProps = {
-  accessToken: string;
   restaurants: Restaurant[];
 };
 
-const Map: React.FC<MapProps> = ({ accessToken, restaurants }) => {
+const Map: React.FC<MapProps> = ({ restaurants }) => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const mapRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
 
   useEffect(() => {
-    if (!mapContainer.current || !accessToken) return;
+    if (!mapContainer.current) return;
 
-    mapboxgl.accessToken = accessToken;
-
-    mapRef.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v12",
-      center: [0, 20],
-      zoom: 1.5,
+    // Initialize map
+    mapRef.current = L.map(mapContainer.current, {
+      center: [40.7128, -74.0060], // Default to NYC
+      zoom: 2,
+      zoomControl: true,
     });
 
-    mapRef.current.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "top-right");
+    // Add OpenStreetMap tiles
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(mapRef.current);
 
     return () => {
-      markersRef.current.forEach((m) => m.remove());
+      markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = [];
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [accessToken]);
+  }, []);
 
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
-    // Clear old markers
-    markersRef.current.forEach((m) => m.remove());
+    // Clear existing markers
+    markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
-    // Add new markers
-    const bounds = new mapboxgl.LngLatBounds();
-    let added = 0;
+    const validRestaurants = restaurants.filter(
+      (r) => typeof r.lat === "number" && typeof r.lng === "number"
+    );
 
-    restaurants.forEach((r) => {
-      if (typeof r.lng === "number" && typeof r.lat === "number") {
-        const popupHtml = `
-          <div style="min-width: 200px">
-            <h3 style="margin:0 0 4px 0;font-weight:600">${r.name}</h3>
-            ${r.address ? `<div style="font-size:12px;color:#666">${r.address}</div>` : ""}
-            ${r.cuisine ? `<div style="font-size:12px;margin-top:6px">Cuisine: ${r.cuisine}</div>` : ""}
-            ${typeof r.rating === "number" ? `<div style="font-size:12px">Rating: ${r.rating}</div>` : ""}
+    // Add markers for restaurants with valid coordinates
+    validRestaurants.forEach((restaurant) => {
+      if (typeof restaurant.lat === "number" && typeof restaurant.lng === "number") {
+        const popupContent = `
+          <div style="min-width: 200px; font-family: system-ui, sans-serif;">
+            <h3 style="margin: 0 0 8px 0; font-weight: 600; font-size: 16px;">${restaurant.name}</h3>
+            ${restaurant.address ? `<p style="margin: 0 0 6px 0; font-size: 14px; color: #666;">${restaurant.address}</p>` : ""}
+            ${restaurant.cuisine ? `<p style="margin: 0 0 4px 0; font-size: 14px;"><strong>Cuisine:</strong> ${restaurant.cuisine}</p>` : ""}
+            ${typeof restaurant.rating === "number" ? `<p style="margin: 0 0 4px 0; font-size: 14px;"><strong>Rating:</strong> ${restaurant.rating}/5</p>` : ""}
+            ${restaurant.price_range ? `<p style="margin: 0 0 4px 0; font-size: 14px;"><strong>Price:</strong> ${restaurant.price_range}</p>` : ""}
+            ${restaurant.description ? `<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">${restaurant.description}</p>` : ""}
           </div>
         `;
 
-        const popup = new mapboxgl.Popup({ offset: 24 }).setHTML(popupHtml);
-
-        const marker = new mapboxgl.Marker({ color: "#dc2626" })
-          .setLngLat([r.lng, r.lat])
-          .setPopup(popup)
-          .addTo(map);
+        const marker = L.marker([restaurant.lat, restaurant.lng])
+          .addTo(map)
+          .bindPopup(popupContent, {
+            maxWidth: 300,
+            className: "restaurant-popup",
+          });
 
         markersRef.current.push(marker);
-        bounds.extend([r.lng, r.lat]);
-        added++;
       }
     });
 
-    if (added > 0) {
-      map.fitBounds(bounds, { padding: 40, duration: 800 });
+    // Fit map to show all markers
+    if (validRestaurants.length > 0) {
+      const group = new L.FeatureGroup(markersRef.current);
+      map.fitBounds(group.getBounds(), { padding: [20, 20] });
     }
   }, [restaurants]);
 
