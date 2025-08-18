@@ -16,11 +16,9 @@ export type Restaurant = {
 };
 
 async function fetchRestaurants(): Promise<Restaurant[]> {
-  const client = supabase as any;
-  const { data, error } = await client
-    .schema("notion")
-    .from("pages")
-    .select("id, title, attrs");
+  const { data, error } = await supabase
+    .from("restaurant_data")
+    .select("id, attrs");
 
   if (error) {
     console.error("Error fetching restaurants:", error);
@@ -32,7 +30,7 @@ async function fetchRestaurants(): Promise<Restaurant[]> {
     const properties = attrs.properties || {};
 
     // Extract restaurant name from title property
-    const nameProperty = properties["Restaurant Name"]?.title?.[0]?.plain_text || row.title || "Unnamed Restaurant";
+    const nameProperty = properties["Restaurant Name"]?.title?.[0]?.plain_text || "Unnamed Restaurant";
     
     // Extract cuisine from Cuisine Type property
     const cuisineProperty = properties["Cuisine Type"]?.select?.name;

@@ -17,7 +17,27 @@ export type Database = {
       [_ in never]: never
     }
     Views: {
-      [_ in never]: never
+      restaurant_data: {
+        Row: {
+          attrs: Json | null
+          created_time: string | null
+          id: string | null
+          last_edited_time: string | null
+        }
+        Insert: {
+          attrs?: Json | null
+          created_time?: string | null
+          id?: string | null
+          last_edited_time?: string | null
+        }
+        Update: {
+          attrs?: Json | null
+          created_time?: string | null
+          id?: string | null
+          last_edited_time?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
