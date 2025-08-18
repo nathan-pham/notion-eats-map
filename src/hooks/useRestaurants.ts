@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { GeocodingService } from "@/services/geocoding";
 
 export type Restaurant = {
   id: string;
@@ -26,7 +27,7 @@ async function fetchRestaurants(): Promise<Restaurant[]> {
     throw error;
   }
 
-  return (data || []).map((row: any) => {
+  const restaurants = (data || []).map((row: any) => {
     const attrs = row.attrs || {};
     const properties = attrs.properties || {};
 
@@ -44,24 +45,41 @@ async function fetchRestaurants(): Promise<Restaurant[]> {
     
     // Extract location from Location multi_select property
     const locationProperty = properties["Location"]?.multi_select;
-    const locationText = locationProperty?.map((loc: any) => loc.name).join(", ");
+    const locationAreas = locationProperty?.map((loc: any) => loc.name);
+    const locationText = locationAreas?.join(", ");
 
-    // Since this data doesn't have lat/lng coordinates, we'll need to handle that differently
-    // For now, we'll return restaurants without coordinates and they won't show on the map
-    
     return {
       id: row.id,
       name: nameProperty,
       address: locationText,
-      lat: undefined, // No coordinates in the Notion data
-      lng: undefined, // No coordinates in the Notion data
+      lat: undefined, // Will be geocoded
+      lng: undefined, // Will be geocoded
       cuisine: cuisineProperty,
       rating: ratingProperty,
       price_range: priceProperty,
       description: properties["What's Good To Try?"]?.rich_text?.[0]?.plain_text,
       raw: attrs,
-    } as Restaurant;
+      locationAreas, // Keep for geocoding
+    } as Restaurant & { locationAreas?: string[] };
   });
+
+  // Geocode restaurants in parallel
+  const geocodedRestaurants = await Promise.all(
+    restaurants.map(async (restaurant) => {
+      const coords = await GeocodingService.geocodeRestaurant(
+        restaurant.name,
+        (restaurant as any).locationAreas
+      );
+      
+      return {
+        ...restaurant,
+        lat: coords?.lat,
+        lng: coords?.lng,
+      };
+    })
+  );
+
+  return geocodedRestaurants;
 }
 
 export function useRestaurants() {
