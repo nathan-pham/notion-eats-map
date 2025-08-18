@@ -40,7 +40,15 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      get_restaurant_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          attrs: Json
+          created_time: string
+          id: string
+          last_edited_time: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

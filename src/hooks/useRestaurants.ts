@@ -16,9 +16,7 @@ export type Restaurant = {
 };
 
 async function fetchRestaurants(): Promise<Restaurant[]> {
-  const { data, error } = await supabase
-    .from("restaurant_data")
-    .select("id, attrs");
+  const { data, error } = await supabase.rpc('get_restaurant_data');
 
   if (error) {
     console.error("Error fetching restaurants:", error);
