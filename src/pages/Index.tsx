@@ -1,43 +1,65 @@
 import { useEffect } from "react";
-import Map from "@/components/Map";
+import RestaurantList from "@/components/RestaurantList";
 import { useRestaurants } from "@/hooks/useRestaurants";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
   const { data: restaurants = [], isLoading, error } = useRestaurants();
 
   useEffect(() => {
-    document.title = "Restaurant Map – Notion data";
+    document.title = "Restaurant Reviews – Find your next meal";
   }, []);
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground">
-      <header className="w-full p-4 border-b border-border">
-        <h1 className="text-xl font-semibold">Restaurant Map</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {restaurants.length} restaurants loaded from Notion
-        </p>
+      <header className="w-full p-6 border-b border-border">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-2xl font-bold">Restaurant Reviews</h1>
+          <p className="text-muted-foreground mt-1">
+            Discover and review amazing places to eat
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {restaurants.length} restaurants available
+          </p>
+        </div>
       </header>
 
-      <main className="relative w-full h-[calc(100vh-5rem)]">
+      <main className="max-w-6xl mx-auto p-6">
         {isLoading && (
-          <div className="absolute inset-0 grid place-items-center text-muted-foreground">
-            Loading restaurants…
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <div className="flex gap-3">
+                <Skeleton className="h-10 flex-1" />
+                <Skeleton className="h-10 w-40" />
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="space-y-3">
+                  <Skeleton className="h-32 w-full rounded-lg" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              ))}
+            </div>
           </div>
         )}
         
         {error && (
-          <div className="absolute inset-0 grid place-items-center text-destructive">
-            Failed to load restaurant data.
+          <div className="text-center py-12">
+            <p className="text-destructive text-lg font-medium">Failed to load restaurant data</p>
+            <p className="text-muted-foreground mt-2">Please try refreshing the page</p>
           </div>
         )}
 
         {!isLoading && !error && (
-          <Map restaurants={restaurants} />
+          <RestaurantList restaurants={restaurants} />
         )}
 
-        <div className="absolute bottom-4 inset-x-0 flex justify-center z-[1000]">
-          <Button asChild className="shadow-lg">
+        <div className="mt-12 text-center">
+          <Button asChild>
             <a
               href="https://food.nathanlepham.com/"
               target="_blank"

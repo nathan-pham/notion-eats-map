@@ -1,13 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { GeocodingService } from "@/services/geocoding";
 
 export type Restaurant = {
   id: string;
   name: string;
-  address?: string;
-  lat?: number;
-  lng?: number;
+  location?: string;
   cuisine?: string;
   rating?: number;
   price_range?: string;
@@ -47,35 +44,16 @@ async function fetchRestaurants(): Promise<Restaurant[]> {
     return {
       id: row.id,
       name: nameProperty,
-      address: locationText,
-      lat: undefined, // Will be geocoded
-      lng: undefined, // Will be geocoded
+      location: locationText,
       cuisine: cuisineProperty,
       rating: ratingProperty,
       price_range: priceProperty,
       description: properties["What's Good To Try?"]?.rich_text?.[0]?.plain_text,
       raw: attrs,
-      locationAreas, // Keep for geocoding
-    } as Restaurant & { locationAreas?: string[] };
+    };
   });
 
-  // Geocode restaurants in parallel
-  const geocodedRestaurants = await Promise.all(
-    restaurants.map(async (restaurant) => {
-      const coords = await GeocodingService.geocodeRestaurant(
-        restaurant.name,
-        (restaurant as any).locationAreas
-      );
-      
-      return {
-        ...restaurant,
-        lat: coords?.lat,
-        lng: coords?.lng,
-      };
-    })
-  );
-
-  return geocodedRestaurants;
+  return restaurants;
 }
 
 export function useRestaurants() {
