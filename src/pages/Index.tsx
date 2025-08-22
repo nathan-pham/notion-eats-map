@@ -15,13 +15,26 @@ const Index = () => {
     <div className="min-h-screen w-full bg-background text-foreground">
       <header className="w-full p-6 border-b border-border">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold">Restaurant Reviews</h1>
-          <p className="text-muted-foreground mt-1">
-            Discover and review amazing places to eat
-          </p>
-          <p className="text-sm text-muted-foreground mt-1">
-            {restaurants.length} restaurants available
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold">Restaurant Reviews</h1>
+              <p className="text-muted-foreground mt-1">
+                Discover and review amazing places to eat
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {restaurants.length} restaurants available
+              </p>
+            </div>
+            <Button asChild>
+              <a
+                href="https://nathanpham.notion.site/1e217e06a1e18010bf7bf0492fd68fb5?pvs=105"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Leave A Review
+              </a>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -57,18 +70,6 @@ const Index = () => {
         {!isLoading && !error && (
           <RestaurantList restaurants={restaurants} />
         )}
-
-        <div className="mt-12 text-center">
-          <Button asChild>
-            <a
-              href="https://food.nathanlepham.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Leave A Review
-            </a>
-          </Button>
-        </div>
       </main>
     </div>
   );
