@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter } from "lucide-react";
 import RestaurantCard from "./RestaurantCard";
+import RestaurantDetailDialog from "./RestaurantDetailDialog";
 import type { Restaurant } from "@/hooks/useRestaurants";
 
 type RestaurantListProps = {
@@ -13,6 +14,8 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [cuisineFilter, setCuisineFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("name");
+  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const cuisines = useMemo(() => {
     const uniqueCuisines = [...new Set(restaurants.map(r => r.cuisine).filter(Boolean))];
@@ -43,6 +46,11 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
 
     return filtered;
   }, [restaurants, searchTerm, cuisineFilter, sortBy]);
+
+  const handleRestaurantClick = (restaurant: Restaurant) => {
+    setSelectedRestaurant(restaurant);
+    setDialogOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -97,7 +105,11 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
       {filteredAndSortedRestaurants.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredAndSortedRestaurants.map((restaurant) => (
-            <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+            <RestaurantCard 
+              key={restaurant.id} 
+              restaurant={restaurant}
+              onClick={() => handleRestaurantClick(restaurant)}
+            />
           ))}
         </div>
       ) : (
@@ -106,6 +118,13 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
           <p className="text-sm mt-1">Try adjusting your search or filters.</p>
         </div>
       )}
+
+      {/* Detail Dialog */}
+      <RestaurantDetailDialog
+        restaurant={selectedRestaurant}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 };

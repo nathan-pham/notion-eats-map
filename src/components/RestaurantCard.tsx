@@ -5,9 +5,10 @@ import type { Restaurant } from "@/hooks/useRestaurants";
 
 type RestaurantCardProps = {
   restaurant: Restaurant;
+  onClick: () => void;
 };
 
-const RestaurantCard = ({ restaurant }: RestaurantCardProps) => {
+const RestaurantCard = ({ restaurant, onClick }: RestaurantCardProps) => {
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
@@ -22,7 +23,7 @@ const RestaurantCard = ({ restaurant }: RestaurantCardProps) => {
   };
 
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow duration-200">
+    <Card className="h-full hover:shadow-lg transition-shadow duration-200 cursor-pointer" onClick={onClick}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-semibold text-lg leading-tight">{restaurant.name}</h3>
