@@ -9,6 +9,10 @@ export type Restaurant = {
   rating?: number;
   price_range?: string;
   description?: string;
+  food_type?: string;
+  good_date_spot?: boolean;
+  seating_size?: string;
+  restaurant_type?: string;
   raw?: any;
 };
 
@@ -41,6 +45,12 @@ async function fetchRestaurants(): Promise<Restaurant[]> {
     const locationAreas = locationProperty?.map((loc: any) => loc.name);
     const locationText = locationAreas?.join(", ");
 
+    // Extract additional properties
+    const foodTypeProperty = properties["Food Type"]?.select?.name;
+    const goodDateSpotProperty = properties["Good Date Spot?"]?.checkbox;
+    const seatingSizeProperty = properties["Seating Size"]?.select?.name;
+    const restaurantTypeProperty = properties["Restaurant Type"]?.select?.name;
+
     return {
       id: row.id,
       name: nameProperty,
@@ -49,6 +59,10 @@ async function fetchRestaurants(): Promise<Restaurant[]> {
       rating: ratingProperty,
       price_range: priceProperty,
       description: properties["What's Good To Try?"]?.rich_text?.[0]?.plain_text,
+      food_type: foodTypeProperty,
+      good_date_spot: goodDateSpotProperty,
+      seating_size: seatingSizeProperty,
+      restaurant_type: restaurantTypeProperty,
       raw: attrs,
     };
   });
