@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from "lucide-react";
+import { Search, ArrowUpDown } from "lucide-react";
 import RestaurantCard from "./RestaurantCard";
 import RestaurantDetailDialog from "./RestaurantDetailDialog";
+import FilterBottomSheet from "./FilterBottomSheet";
 import type { Restaurant } from "@/hooks/useRestaurants";
 
 type RestaurantListProps = {
@@ -79,6 +80,59 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
       ratingFilter, goodDateSpotFilter, seatingSizeFilter, restaurantTypeFilter, 
       locationFilter, sortBy]);
 
+  const filters = {
+    cuisine: cuisineFilter,
+    foodType: foodTypeFilter,
+    priceRange: priceRangeFilter,
+    rating: ratingFilter,
+    goodDateSpot: goodDateSpotFilter,
+    seatingSize: seatingSizeFilter,
+    restaurantType: restaurantTypeFilter,
+    location: locationFilter
+  };
+
+  const activeFilterCount = Object.values(filters).filter(value => value !== "all").length;
+
+  const handleFilterChange = (filterType: string, value: string) => {
+    switch (filterType) {
+      case "cuisine":
+        setCuisineFilter(value);
+        break;
+      case "foodType":
+        setFoodTypeFilter(value);
+        break;
+      case "priceRange":
+        setPriceRangeFilter(value);
+        break;
+      case "rating":
+        setRatingFilter(value);
+        break;
+      case "goodDateSpot":
+        setGoodDateSpotFilter(value);
+        break;
+      case "seatingSize":
+        setSeatingSizeFilter(value);
+        break;
+      case "restaurantType":
+        setRestaurantTypeFilter(value);
+        break;
+      case "location":
+        setLocationFilter(value);
+        break;
+    }
+  };
+
+  const handleClearFilters = () => {
+    setCuisineFilter("all");
+    setFoodTypeFilter("all");
+    setPriceRangeFilter("all");
+    setRatingFilter("all");
+    setGoodDateSpotFilter("all");
+    setSeatingSizeFilter("all");
+    setRestaurantTypeFilter("all");
+    setLocationFilter("all");
+  };
+
   const handleRestaurantClick = (restaurant: Restaurant) => {
     setSelectedRestaurant(restaurant);
     setDialogOpen(true);
@@ -91,146 +145,50 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
-            placeholder="Search restaurants, locations, or dishes..."
+            placeholder="Search restaurants, dishes, or locations..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-app-surface-elevated border-border placeholder:text-muted-foreground focus:ring-primary"
           />
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <Select value={cuisineFilter} onValueChange={setCuisineFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Cuisine" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All cuisines</SelectItem>
-                {filterOptions.cuisines.map(cuisine => (
-                  <SelectItem key={cuisine} value={cuisine}>
-                    {cuisine}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Select value={foodTypeFilter} onValueChange={setFoodTypeFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Food Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All food types</SelectItem>
-              {filterOptions.foodTypes.map(type => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={priceRangeFilter} onValueChange={setPriceRangeFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Price Range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All prices</SelectItem>
-              {filterOptions.priceRanges.map(price => (
-                <SelectItem key={price} value={price}>
-                  {price}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={ratingFilter} onValueChange={setRatingFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Rating" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All ratings</SelectItem>
-              {filterOptions.ratings.map(rating => (
-                <SelectItem key={rating} value={rating}>
-                  {rating === "5" ? "5 stars" : `${rating} stars & up`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={goodDateSpotFilter} onValueChange={setGoodDateSpotFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Date Spot" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Any</SelectItem>
-              <SelectItem value="yes">Good for dates</SelectItem>
-              <SelectItem value="no">Not for dates</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select value={seatingSizeFilter} onValueChange={setSeatingSizeFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Seating" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All sizes</SelectItem>
-              {filterOptions.seatingSizes.map(size => (
-                <SelectItem key={size} value={size}>
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={restaurantTypeFilter} onValueChange={setRestaurantTypeFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All types</SelectItem>
-              {filterOptions.restaurantTypes.map(type => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={locationFilter} onValueChange={setLocationFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="Location" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All locations</SelectItem>
-              {filterOptions.locations.map(location => (
-                <SelectItem key={location} value={location}>
-                  {location}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
+        <div className="flex items-center justify-between gap-3">
+          <FilterBottomSheet
+            filterOptions={filterOptions}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onClearFilters={handleClearFilters}
+            activeFilterCount={activeFilterCount}
+          />
+          
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sort by" />
+            <SelectTrigger className="w-auto min-w-[140px] bg-app-surface-elevated border-border">
+              <ArrowUpDown className="w-4 h-4 mr-2" />
+              <SelectValue />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="name">Sort by Name</SelectItem>
-              <SelectItem value="rating">Sort by Rating</SelectItem>
+            <SelectContent className="bg-popover border-border">
+              <SelectItem value="name">Name A-Z</SelectItem>
+              <SelectItem value="rating">Best Rated</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
       {/* Results Summary */}
-      <div className="text-sm text-muted-foreground">
-        {filteredAndSortedRestaurants.length} restaurant{filteredAndSortedRestaurants.length !== 1 ? 's' : ''} found
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-muted-foreground">
+          {filteredAndSortedRestaurants.length} restaurant{filteredAndSortedRestaurants.length !== 1 ? 's' : ''} found
+        </div>
+        {activeFilterCount > 0 && (
+          <div className="text-xs text-primary">
+            {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} active
+          </div>
+        )}
       </div>
 
       {/* Restaurant Grid */}
       {filteredAndSortedRestaurants.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in">
           {filteredAndSortedRestaurants.map((restaurant) => (
             <RestaurantCard 
               key={restaurant.id} 
@@ -240,9 +198,10 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 text-muted-foreground">
-          <p>No restaurants found matching your criteria.</p>
-          <p className="text-sm mt-1">Try adjusting your search or filters.</p>
+        <div className="text-center py-16 space-y-2 animate-fade-in">
+          <div className="text-5xl mb-4">🔍</div>
+          <p className="text-lg text-foreground">No restaurants found</p>
+          <p className="text-sm text-muted-foreground">Try adjusting your search or filters to discover new places</p>
         </div>
       )}
 
