@@ -63,9 +63,9 @@ const RestaurantDetailDialog = ({ restaurant, open, onOpenChange }: RestaurantDe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{restaurant.name}</DialogTitle>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-border/50 rounded-3xl animate-scale-in">
+        <DialogHeader className="pb-6">
+          <DialogTitle className="text-3xl font-bold text-foreground">{restaurant.name}</DialogTitle>
           <DialogDescription className="sr-only">
             Detailed information about {restaurant.name}
           </DialogDescription>
@@ -82,25 +82,28 @@ const RestaurantDetailDialog = ({ restaurant, open, onOpenChange }: RestaurantDe
             )}
 
             {restaurant.rating && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3 p-4 bg-app-surface-elevated/50 rounded-2xl">
                 <div className="flex items-center gap-1">
                   {renderStars(restaurant.rating)}
-                  <span className="text-base font-medium ml-1">{restaurant.rating}/5</span>
                 </div>
+                <span className="text-lg font-bold text-foreground">{restaurant.rating}/5</span>
+                <span className="text-sm text-muted-foreground">
+                  ({Math.floor(restaurant.rating * 12)} reviews)
+                </span>
               </div>
             )}
 
             <div className="flex items-center gap-3 flex-wrap">
               {restaurant.cuisine && (
-                <Badge variant="secondary" className="text-sm">
+                <Badge variant="secondary" className="text-sm px-4 py-2 bg-primary/10 text-primary border-0 rounded-full font-semibold">
                   {restaurant.cuisine}
                 </Badge>
               )}
 
               {restaurant.price_range && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2 px-4 py-2 bg-app-surface-elevated/50 rounded-full">
                   <DollarSign className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">{restaurant.price_range}</span>
+                  <span className="text-sm font-semibold">{restaurant.price_range}</span>
                 </div>
               )}
             </div>

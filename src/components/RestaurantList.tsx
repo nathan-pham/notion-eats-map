@@ -143,12 +143,12 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
       {/* Search and Filter Controls */}
       <div className="space-y-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
           <Input
             placeholder="Search restaurants, dishes, or locations..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-app-surface-elevated border-border placeholder:text-muted-foreground focus:ring-primary"
+            className="pl-12 pr-4 py-3 h-12 bg-app-surface-elevated/80 backdrop-blur-sm border-border/50 placeholder:text-muted-foreground focus:ring-primary focus:border-primary rounded-xl text-base transition-all duration-200"
           />
         </div>
 
@@ -162,13 +162,13 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
           />
           
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-auto min-w-[140px] bg-app-surface-elevated border-border">
+            <SelectTrigger className="w-auto min-w-[140px] bg-app-surface-elevated/80 backdrop-blur-sm border-border/50 rounded-full h-10 hover:bg-app-surface-elevated hover:border-border transition-all duration-200">
               <ArrowUpDown className="w-4 h-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-popover border-border">
-              <SelectItem value="name">Name A-Z</SelectItem>
-              <SelectItem value="rating">Best Rated</SelectItem>
+            <SelectContent className="bg-popover/95 backdrop-blur-xl border-border/50 rounded-xl">
+              <SelectItem value="name" className="rounded-lg">Name A-Z</SelectItem>
+              <SelectItem value="rating" className="rounded-lg">Best Rated</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -188,20 +188,25 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
 
       {/* Restaurant Grid */}
       {filteredAndSortedRestaurants.length > 0 ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in">
-          {filteredAndSortedRestaurants.map((restaurant) => (
-            <RestaurantCard 
-              key={restaurant.id} 
-              restaurant={restaurant}
-              onClick={() => handleRestaurantClick(restaurant)}
-            />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in">
+          {filteredAndSortedRestaurants.map((restaurant, index) => (
+            <div
+              key={restaurant.id}
+              className="animate-scale-in"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <RestaurantCard 
+                restaurant={restaurant}
+                onClick={() => handleRestaurantClick(restaurant)}
+              />
+            </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-16 space-y-2 animate-fade-in">
-          <div className="text-5xl mb-4">🔍</div>
-          <p className="text-lg text-foreground">No restaurants found</p>
-          <p className="text-sm text-muted-foreground">Try adjusting your search or filters to discover new places</p>
+        <div className="text-center py-20 space-y-4 animate-bounce-in">
+          <div className="text-7xl mb-6">🔍</div>
+          <p className="text-xl font-semibold text-foreground">No restaurants found</p>
+          <p className="text-base text-muted-foreground">Try adjusting your search or filters to discover new places</p>
         </div>
       )}
 

@@ -105,22 +105,30 @@ const FilterBottomSheet = ({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="outline" className="relative bg-app-surface-elevated border-border hover:bg-muted">
+        <Button 
+          variant="outline" 
+          className="relative bg-app-surface-elevated/80 backdrop-blur-sm border-border/50 hover:bg-app-surface-elevated hover:border-border rounded-full px-4 py-2 h-10 transition-all duration-200"
+        >
           <SlidersHorizontal className="w-4 h-4 mr-2" />
-          Filters
+          <span className="font-medium">Filters</span>
           {activeFilterCount > 0 && (
-            <Badge className="ml-2 bg-primary text-primary-foreground text-xs px-1.5 py-0.5 min-w-[20px] h-5">
+            <Badge className="ml-2 bg-primary text-primary-foreground text-xs px-2 py-0.5 min-w-[20px] h-5 rounded-full animate-bounce-in">
               {activeFilterCount}
             </Badge>
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="bg-app-surface border-border max-h-[85vh] overflow-y-auto">
+      <SheetContent 
+        side="bottom" 
+        className="bg-background/95 backdrop-blur-xl border-border/50 max-h-[90vh] overflow-y-auto rounded-t-3xl border-t-0 animate-slide-up"
+      >
+        <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6 mt-2" />
+        
         <SheetHeader className="text-left pb-6">
           <div className="flex items-center justify-between">
             <div>
-              <SheetTitle className="text-foreground">Filter Restaurants</SheetTitle>
-              <SheetDescription className="text-muted-foreground">
+              <SheetTitle className="text-foreground text-2xl font-bold">Filters</SheetTitle>
+              <SheetDescription className="text-muted-foreground text-base mt-1">
                 Find exactly what you're craving
               </SheetDescription>
             </div>
@@ -129,7 +137,7 @@ const FilterBottomSheet = ({
                 variant="ghost" 
                 size="sm" 
                 onClick={onClearFilters}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground rounded-full h-10 px-4"
               >
                 <X className="w-4 h-4 mr-1" />
                 Clear all
@@ -138,22 +146,30 @@ const FilterBottomSheet = ({
           </div>
         </SheetHeader>
         
-        <div className="grid gap-6 pb-6">
-          {filterSections.map((section) => (
-            <div key={section.key} className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
+        <div className="grid gap-6 pb-8">
+          {filterSections.map((section, index) => (
+            <div 
+              key={section.key} 
+              className="space-y-3 animate-fade-in"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <label className="text-sm font-semibold text-foreground uppercase tracking-wide">
                 {section.title}
               </label>
               <Select 
                 value={section.value} 
                 onValueChange={(value) => onFilterChange(section.key, value)}
               >
-                <SelectTrigger className="w-full bg-app-surface-elevated border-border">
+                <SelectTrigger className="w-full bg-app-surface-elevated/50 backdrop-blur-sm border-border/50 rounded-xl h-12 text-base hover:bg-app-surface-elevated hover:border-border transition-all duration-200">
                   <SelectValue placeholder={`Select ${section.title.toLowerCase()}`} />
                 </SelectTrigger>
-                <SelectContent className="bg-popover border-border">
+                <SelectContent className="bg-popover/95 backdrop-blur-xl border-border/50 rounded-xl">
                   {section.options.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
+                    <SelectItem 
+                      key={option.value} 
+                      value={option.value}
+                      className="rounded-lg py-3 px-4 text-base"
+                    >
                       {option.label}
                     </SelectItem>
                   ))}
@@ -163,12 +179,12 @@ const FilterBottomSheet = ({
           ))}
         </div>
 
-        <div className="flex gap-3 pt-6 border-t border-border">
+        <div className="flex gap-3 pt-6 border-t border-border/30 pb-safe-bottom">
           <Button 
             onClick={() => setOpen(false)}
-            className="flex-1 bg-gradient-primary hover:opacity-90 text-primary-foreground"
+            className="flex-1 bg-gradient-primary hover:opacity-90 text-primary-foreground rounded-xl h-12 text-base font-semibold shadow-lg"
           >
-            Apply Filters
+            Show Results
           </Button>
         </div>
       </SheetContent>
