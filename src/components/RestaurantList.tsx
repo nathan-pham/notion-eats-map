@@ -138,6 +138,14 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
     setDialogOpen(true);
   };
 
+  const handleRandomPick = () => {
+    if (filteredAndSortedRestaurants.length > 0) {
+      const randomIndex = Math.floor(Math.random() * filteredAndSortedRestaurants.length);
+      const randomRestaurant = filteredAndSortedRestaurants[randomIndex];
+      handleRestaurantClick(randomRestaurant);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Search and Filter Controls */}
@@ -174,14 +182,32 @@ const RestaurantList = ({ restaurants }: RestaurantListProps) => {
         </div>
       </div>
 
-      {/* Results Summary */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          {filteredAndSortedRestaurants.length} restaurant{filteredAndSortedRestaurants.length !== 1 ? 's' : ''} found
+      {/* Results Summary & Random Pick */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            {filteredAndSortedRestaurants.length} restaurant{filteredAndSortedRestaurants.length !== 1 ? 's' : ''} found
+          </div>
+          {activeFilterCount > 0 && (
+            <div className="text-xs text-primary">
+              {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} active
+            </div>
+          )}
         </div>
-        {activeFilterCount > 0 && (
-          <div className="text-xs text-primary">
-            {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''} active
+
+        {/* Random Pick Button */}
+        {filteredAndSortedRestaurants.length > 0 && (
+          <div className="flex justify-center animate-fade-in">
+            <button
+              onClick={handleRandomPick}
+              className="group relative bg-gradient-primary text-primary-foreground px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 active:scale-95"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl group-hover:animate-bounce">🎲</span>
+                <span>Surprise Me!</span>
+              </div>
+              <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </button>
           </div>
         )}
       </div>
